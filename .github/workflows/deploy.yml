@@ -22,7 +22,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -38,24 +39,24 @@ jobs:
           html_path: ${{ env.PUBLISH_DIR }}/index.html
           base_href: /${{ github.event.repository.name }}/
 
-      - name: Add .nojekyll (published site)
+      - name: Add .nojekyll
         run: touch ${{ env.PUBLISH_DIR }}/.nojekyll
 
       - name: SPA fallback (copy index.html to 404.html)
         run: cp ${{ env.PUBLISH_DIR }}/index.html ${{ env.PUBLISH_DIR }}/404.html
 
-      - name: Upload artifact
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ${{ env.PUBLISH_DIR }}
-deploy:
-  needs: build
-  runs-on: ubuntu-latest
-  environment:
-    name: github-pages
-    url: ${{ steps.deployment.outputs.page_url }}
-  steps:
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
